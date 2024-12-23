@@ -36,4 +36,5 @@ Before running the script, ensure the following:
    cd project5 MongoDB
 
 2- Install the required Python libraries:
+```bash
 pip install -r requirements.txt
