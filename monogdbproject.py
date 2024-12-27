@@ -41,7 +41,7 @@ def migrate_to_mongodb(data,db_name,collection_name):
     """   
     try:
         logging.info("Connecting to MongoDB...")
-        client = MongoClient('mongodb://localhost:27017/')
+        client = MongoClient('mongodb://mongodb:27017/')
         logging.info("Successfully connected to MongoDB.")
 
         db = client[db_name]
