@@ -39,22 +39,23 @@ def migrate_to_mongodb(data,db_name,collection_name):
     Returns :
         None 
     """   
-    try :
-        #connect to MongoDB
-        logging.info("connection to MongoDB...")
-        client=MongoClient('mongodb://localhost:27017/')
-        db = client[db_name]
-        collection = db[collection_name]
-        logging.info("Connected to MongoDB successfully")
+    try:
+        logging.info("Connecting to MongoDB...")
+        client = MongoClient('mongodb://localhost:27017/')
+        logging.info("Successfully connected to MongoDB.")
 
-        #insert data into MongoDB
+        db = client[db_name]
+        logging.info(f"Using database: {db_name}")
+
+        collection = db[collection_name]
+        logging.info(f"Using collection: {collection_name}")
+
         logging.info(f"Inserting {len(data)} records into MongoDB...")
         collection.insert_many(data)
-        logging.info("Data inserted successfully")
+        logging.info("Data inserted successfully.")
 
-        # Display a few records
-        logging.info("Fetching sample records...")
-        for document in collection.find().limit(5):
+        logging.info("Fetching and displaying sample records...")
+        for document in collection.find().limit(1):
             logging.info(document)
 
     except Exception as e:
@@ -65,3 +66,6 @@ def migrate_to_mongodb(data,db_name,collection_name):
 db_name = 'healthcare'
 collection_name = "patients"
 migrate_to_mongodb(healthcare_dict,db_name, collection_name)
+
+
+
