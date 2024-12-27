@@ -30,11 +30,14 @@ Before running the script, ensure the following:
 
 ## Installation
 
-1. Clone the repository to your local machine:
-   ```bash
-   git clone <repository_url>
-   cd project5 MongoDB
 
-2- Install the required Python libraries:
-```bash
+ # Clone the repository
+git clone https://github.com/Motasem-mk/project5-MongoDB.git
+
+# Navigate to the project folder
+cd project5-MongoDB
+
+# Install required libraries
 pip install -r requirements.txt
+
+
