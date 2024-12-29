@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import pandas as pd
 import logging
 import os 
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -12,8 +13,6 @@ collection_name = os.getenv("COLLECTION_NAME", "patients")
 
 # Global MongoDB connection
 logging.info("Connecting to MongoDB...")
-
-
 client = MongoClient(mongo_uri)
 logging.info("Successfully connected to MongoDB.")
 
@@ -23,9 +22,7 @@ logging.info(f"Using database: {db_name}")
 collection = db[collection_name]
 logging.info(f"Using collection: {collection_name}")
 
-
-
-# Data cleaning
+# Data cleaning and migration
 logging.info("Loading and cleaning the dataset...")
 healthcare = pd.read_csv("healthcare_dataset.csv")
 healthcare = healthcare.drop_duplicates()
@@ -51,18 +48,19 @@ logging.info(f"Inserting {len(healthcare_dict)} records into MongoDB...")
 collection.insert_many(healthcare_dict)
 logging.info("Data inserted successfully.")
 
-# CRUD Operations
-#1-Create (insert a new record)
-def create_patient_record(new_record):
-    try:
-        result = collection.insert_one(new_record)
-        logging.info(f"CRUD Operation 1-Create ... >>> Record inserted with ID: {result.inserted_id}")
-        return result.inserted_id
-    except Exception as e:
-        logging.error(f"Error inserting record: {e}")
-        return None
+# Creating a user with specific roles (if needed)
+try:
+    admin_db = client["admin"]
+    logging.info("Creating a new user 'crud_user' with readWrite role for the healthcare database...")
+    admin_db.command("createUser", "crud_user", pwd="crudpassword", roles=[
+        {"role": "readWrite", "db": "healthcare"}
+    ])
+    logging.info("User 'crud_user' created successfully.")
+except Exception as e:
+    logging.warning(f"Error creating user or user already exists: {e}")
 
-# Example: Add a new record
+# CRUD Operations
+# Create
 new_record = {
     "Name": "Alice Brown",
     "Age": 25,
@@ -80,57 +78,39 @@ new_record = {
     "Medication": "Inhaler",
     "Test Results": "Improved"
 }
-create_patient_record(new_record)
+logging.info("Inserting a new patient record...")
+insert_result = collection.insert_one(new_record)
+logging.info(f"Record inserted with ID: {insert_result.inserted_id}")
 
-#2. Read (Query Records)
-def read_patient_records(collection, query={}):
-    try:
-        results = collection.find(query)
-        records = list(results)
-        logging.info(f"CRUD Operation 2. Read ... >>> Found {len(records)} record(s) matching the query.")
-        return records
-    except Exception as e:
-        logging.error(f"Error reading records: {e}")
-        return []
-query1 = {"Age": {"$gte": 88}}  # Get all patients aged 87 or older
-documents = read_patient_records(collection, query1)
+# Read
+query = {"Age": {"$gte": 88}}  # Get all patients aged 88 or older
+logging.info(f"Querying records with age >= 88...")
+results = collection.find(query)
+records = list(results)
+logging.info(f"Found {len(records)} record(s) matching the query.")
 
+# Update
+query = {'Name': 'Alice Brown'}  # Find record with this name
+update_fields = {'Room Number': 203, 'Billing Amount': 12000}
+logging.info("Updating patient record for 'Alice Brown'...")
+update_result = collection.update_many(query, {"$set": update_fields})
+logging.info(f"Matched: {update_result.matched_count}, Modified: {update_result.modified_count}")
 
-#3. Update (Modify an Existing Record)
+# Verify the updated record
+updated_record = collection.find({'Name': 'Alice Brown'})
+logging.info("Updated record:")
+for doc in updated_record:
+    print(doc)
 
-def update_patient_record(collection, query, update_fields):
-    try:
-        result = collection.update_many(query, {"$set": update_fields})
-        logging.info(f"CRUD Operation 3. Update ... >>> Updated {result.modified_count} record(s).")
-        return f"Matched :{result.matched_count} , Modified : {result.modified_count} "
+# Delete
+query = {"Name": "Alice Brown"}  # Delete records with this name
+logging.info("Deleting patient record for 'Alice Brown'...")
+delete_result = collection.delete_many(query)
+logging.info(f"Deleted {delete_result.deleted_count} record(s).")
 
-    except Exception as e:
-        logging.error(f"Error updating records: {e}")
-        return 0
-
-query2 = {'Name': 'Alice Brown'} # find record with this name 
-update_field = {'Room Number':203 , 'Billing Amount':12000}
-update_patient_record(collection , query2, update_field)
-
-#check the updated document
-document = collection.find({'Name': 'Alice Brown'})
-for i in document :
-    print(i)
-
-#4. Delete (Remove Records)
-def delete_patient_records(collection, query):
-    try:
-        result = collection.delete_many(query)
-        logging.info(f"CRUD Operation 4. Delete... >> Deleted {result.deleted_count} record(s).")
-        return result.deleted_count
-    except Exception as e:
-        logging.error(f"Error deleting records: {e}")
-        return 0
-
-query3 = {"Name": "Alice Brown"}  # Delete records with this name
-delete_patient_records(collection, query3)
-
-# check deleted record >> should print nothing  if the record is deleted 
-doc= collection.find({'Name': 'Alice Brown'})
-for i in doc :
-    print(i)
+# Verify the deletion
+deleted_check = collection.find({'Name': 'Alice Brown'})
+if deleted_check.count() == 0:
+    logging.info("Record successfully deleted.")
+else:
+    logging.warning("Record was not deleted.")
