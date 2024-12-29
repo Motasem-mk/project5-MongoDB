@@ -1,23 +1,29 @@
 from pymongo import MongoClient
 import pandas as pd
 import logging
-
+import os 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Environment variables for MongoDB credentials
+mongo_uri = os.getenv("MONGO_URI", "mongodb://admin:securepassword@mongodb:27017/")
+db_name = os.getenv("DB_NAME", "healthcare")
+collection_name = os.getenv("COLLECTION_NAME", "patients")
+
 # Global MongoDB connection
 logging.info("Connecting to MongoDB...")
-client = MongoClient('mongodb://mongodb:27017/')
+
+
+client = MongoClient(mongo_uri)
 logging.info("Successfully connected to MongoDB.")
 
-db_name = 'healthcare'
+db = client[db_name]
 logging.info(f"Using database: {db_name}")
 
-collection_name = "patients"
+collection = db[collection_name]
 logging.info(f"Using collection: {collection_name}")
 
-db = client[db_name]
-collection = db[collection_name]
+
 
 # Data cleaning
 logging.info("Loading and cleaning the dataset...")
@@ -86,11 +92,8 @@ def read_patient_records(collection, query={}):
     except Exception as e:
         logging.error(f"Error reading records: {e}")
         return []
-query1 = {"Age": {"$gte": 87}}  # Get all patients aged 87 or older
+query1 = {"Age": {"$gte": 88}}  # Get all patients aged 87 or older
 documents = read_patient_records(collection, query1)
-
-for document in documents:
-    print(documents)
 
 
 #3. Update (Modify an Existing Record)
