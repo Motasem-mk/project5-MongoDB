@@ -7,22 +7,19 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Environment variables for MongoDB credentials
-mongo_uri = os.getenv("MONGO_URI", "mongodb://admin:securepassword@mongodb:27017/")
-db_name = os.getenv("DB_NAME", "healthcare")
-collection_name = os.getenv("COLLECTION_NAME", "patients")
+admin_mongo_uri = "mongodb://admin:securepassword@mongodb:27017/"  #  admin credentials
+db_name = "healthcare"
+collection_name = "patients"
 
-# Global MongoDB connection
-logging.info("Connecting to MongoDB...")
-client = MongoClient(mongo_uri)
-logging.info("Successfully connected to MongoDB.")
-
-db = client[db_name]
+# Step 1: Connect as admin
+logging.info("Connecting to MongoDB as admin...")
+admin_client = MongoClient(admin_mongo_uri)
+db = admin_client[db_name]
 logging.info(f"Using database: {db_name}")
-
 collection = db[collection_name]
 logging.info(f"Using collection: {collection_name}")
 
-# Data cleaning and migration
+# Step 2: Data migration
 logging.info("Loading and cleaning the dataset...")
 healthcare = pd.read_csv("healthcare_dataset.csv")
 healthcare = healthcare.drop_duplicates()
@@ -48,18 +45,7 @@ logging.info(f"Inserting {len(healthcare_dict)} records into MongoDB...")
 collection.insert_many(healthcare_dict)
 logging.info("Data inserted successfully.")
 
-# Creating a user with specific roles (if needed)
-try:
-    admin_db = client["admin"]
-    logging.info("Creating a new user 'crud_user' with readWrite role for the healthcare database...")
-    admin_db.command("createUser", "crud_user", pwd="crudpassword", roles=[
-        {"role": "readWrite", "db": "healthcare"}
-    ])
-    logging.info("User 'crud_user' created successfully.")
-except Exception as e:
-    logging.warning(f"Error creating user or user already exists: {e}")
-
-# CRUD Operations
+# Step 3: CRUD Operations
 # Create
 new_record = {
     "Name": "Alice Brown",
