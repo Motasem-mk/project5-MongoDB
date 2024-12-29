@@ -205,13 +205,6 @@ Docker Compose allows you to define and run multi-container Docker applications.
 
 ---
 
-### **Future Enhancements**
-- Deploy the application on AWS using Amazon ECS and DocumentDB.
-- Automate backup and monitoring for MongoDB.
-- Add more advanced data validation and transformation steps.
-
----
-
 ## **Author**
 Motasem Abualqumboz
 
