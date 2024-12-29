@@ -8,6 +8,9 @@ services:  # Defines the services to be managed by Docker Compose.
       - "27017:27017"  # Maps port 27017 on the host to port 27017 in the container (MongoDB's default port).
     volumes:
       - mongodb_data:/data/db  # Attaches a named volume 'mongodb_data' to persist data in /data/db (MongoDB's data directory).
+    environment:  # Environment variables for MongoDB authentication.
+      - MONGO_INITDB_ROOT_USERNAME=admin  # Admin username.
+      - MONGO_INITDB_ROOT_PASSWORD=securepassword  # Admin password.
 
   migration:  # Name of the second service (Python script for data migration).
     build:  # Specifies how to build the image for this service.
