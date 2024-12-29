@@ -1,7 +1,3 @@
-To ensure the README includes all the required updates (including **credentials**, **user roles**, **schema**, and other important information), I've revised your **`README.md`** to include sections on **authentication**, **user roles**, **database schema**, and other related details. Here's the updated version:
-
----
-
 ## **MongoDB Data Migration Project**
 
 ### **Project Overview**
