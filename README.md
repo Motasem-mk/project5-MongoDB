@@ -12,6 +12,20 @@ This project demonstrates the use of Python for migrating healthcare data from a
    - Converts date fields to `datetime` format.
    - Inserts the cleaned data into MongoDB.
 
+
+## **Data Integrity Checks**
+Before and after migration, the script performs the following data integrity checks:
+**Pre-migration checks**:
+   - Missing values in essential fields.
+   - Duplicates in the dataset.
+   - Invalid dates (Discharge Date must be after Admission Date).
+   - Negative values in key fields like Age and Billing Amount.
+**Post-migration checks**:
+   - Ensures the number of records in MongoDB matches the original dataset.
+   - Verifies that required fields (e.g., Age, Medical Condition, Name) are present.
+   - Checks that dates and numeric fields are logically consistent.
+
+
 2. **CRUD Operations**:
    - **Create**: Add new records to the database.
    - **Read**: Query records based on specific criteria.
