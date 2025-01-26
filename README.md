@@ -5,7 +5,6 @@ This project demonstrates the use of Python for migrating healthcare data from a
 
 ---
 
-```markdown
 ## Prerequisites
 - Docker installed ([Install Docker](https://docs.docker.com/get-docker/))
 - Docker Compose installed ([Install Docker Compose](https://docs.docker.com/compose/install/))
