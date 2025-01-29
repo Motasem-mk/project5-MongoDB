@@ -5,62 +5,12 @@ This project demonstrates the use of Python for migrating healthcare data from a
 
 ---
 
-## Prerequisites
-- Docker installed ([Install Docker](https://docs.docker.com/get-docker/))
-- Docker Compose installed ([Install Docker Compose](https://docs.docker.com/compose/install/))
-
-## Steps to Run
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Motasem-mk/project5-MongoDB.git
-   cd project5-MongoDB
-   ```
-
-2. Run the migration:
-   ```bash
-   docker-compose up
-   ```
-   - This will:
-     - Start a MongoDB container.
-     - Build and run a Python container to migrate the data from the CSV file to MongoDB.
-
-3. Verify the data:
-   - Connect to MongoDB at `localhost:27017` using a MongoDB client (e.g., [MongoDB Compass](https://www.mongodb.com/products/compass)).
-   - Check the database and collection specified in `mongodbproject.py`.
-
-## Notes
-- The CSV file (`healthcare_dataset.csv`) is included in the repository and will be used for the migration.
-- MongoDB will be available at `localhost:27017`.
-- The Python script (`mongodbproject.py`) reads the CSV file and inserts the data into MongoDB.
-
-## Project Structure
-```
-project5-MongoDB/
-├── Dockerfile
-├── docker-compose.yml
-├── healthcare_dataset.csv
-├── mongodbproject.py
-├── requirements.txt
-└── README.md
-```
-
-## Troubleshooting
-- If the migration fails, ensure that:
-  - Docker and Docker Compose are installed correctly.
-  - The CSV file (`healthcare_dataset.csv`) is present in the project directory.
-  - MongoDB is running and accessible at `localhost:27017`.
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
 ### **Features**
 1. **Data Migration**:
    - Reads healthcare data from a CSV file.
    - Cleans the dataset by removing duplicates and ensuring logical consistency.
    - Converts date fields to `datetime` format.
    - Inserts the cleaned data into MongoDB.
-
 
 ## **Data Integrity Checks**
 Before and after migration, the script performs the following data integrity checks:
@@ -73,6 +23,7 @@ Before and after migration, the script performs the following data integrity che
    - Ensures the number of records in MongoDB matches the original dataset.
    - Verifies that required fields (e.g., Age, Medical Condition, Name) are present.
    - Checks that dates and numeric fields are logically consistent.
+
 
 
 2. **CRUD Operations**:
@@ -131,7 +82,79 @@ The schema is simple, focusing on patient details and hospital admission informa
 
 ---
 
+### **Installation and Setup**
 
+#### **Step 1: Clone the Repository**
+```bash
+git clone https://github.com/Motasem-mk/project5-MongoDB.git
+cd project5-MongoDB
+```
+
+#### **Step 2: Install Python Dependencies**
+Create and activate a virtual environment (optional but recommended):
+```bash
+python -m venv env
+source env/bin/activate  # On Windows: .\env\Scripts\activate
+```
+Install the dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+#### **Step 3: Run the Python Script**
+Execute the migration script to load data into MongoDB:
+```bash
+python mongodbproject.py
+```
+
+#### **Step 4: Dockerize the Application**
+1. Build the Docker image for the Python script:
+   ```bash
+   docker build -t mongodb-migration .
+   ```
+
+2. Use Docker Compose to run both MongoDB and the Python container:
+   ```bash
+   docker-compose up
+   ```
+
+---
+
+### **File Structure**
+- `mongodbproject.py`: The Python script for data migration and CRUD operations.
+- `requirements.txt`: Python dependencies.
+- `Dockerfile`: Instructions to containerize the Python script.
+- `docker-compose.yml`: Configuration for running MongoDB and the Python container together.
+- `README.md`: Documentation of the project.
+
+---
+
+### **Docker Instructions**
+
+#### **Build and Run Docker Images**
+1. Build the Docker image for the Python script:
+   ```bash
+   docker build -t mongodb-migration .
+   ```
+
+2. Pull the official MongoDB image:
+   ```bash
+   docker pull mongo:latest
+   ```
+
+3. Use Docker Compose to start the services:
+   ```bash
+   docker-compose up
+   ```
+
+#### **Docker Compose Configuration**
+- **MongoDB Service**:
+  - Image: `mongo:latest`
+  - Volume: Persists MongoDB data.
+
+- **Migration Service**:
+  - Image: Built from the provided `Dockerfile`.
+  - Depends on the MongoDB service.
 
 ---
 
@@ -196,8 +219,14 @@ Docker Compose allows you to define and run multi-container Docker applications.
 
 ---
 
+### **Future Enhancements**
+- Deploy the application on AWS using Amazon ECS and DocumentDB.
+- Automate backup and monitoring for MongoDB.
+- Add more advanced data validation and transformation steps.
+
+---
+
 ## **Author**
 Motasem Abualqumboz
 
 For more information, refer to the [GitHub Repository](https://github.com/Motasem-mk/project5-MongoDB).
-
