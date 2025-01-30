@@ -1,12 +1,21 @@
 from pymongo import MongoClient
 import pandas as pd
 import logging
+import os  # Import os to access environment variables
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Environment variables for MongoDB credentials
-admin_mongo_uri = "mongodb://admin:motasem@mongodb:27017/"  #  admin credentials
+# Read MongoDB credentials from environment variables
+mongo_username = os.getenv("MONGO_INITDB_ROOT_USERNAME", "admin")  # Default to 'admin' if not set
+mongo_password = os.getenv("MONGO_INITDB_ROOT_PASSWORD", "password")  # Default to 'password' if not set
+mongo_host = "mongodb"  # Service name in docker-compose.yml
+mongo_port = 27017  # Default MongoDB port
+
+# Construct the MongoDB connection URI
+admin_mongo_uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/"
+
+# Database and collection names
 db_name = "healthcare"
 collection_name = "patients"
 
