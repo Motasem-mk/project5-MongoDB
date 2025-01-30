@@ -1,232 +1,212 @@
-## **MongoDB Data Migration Project**
+# **Healthcare Data Migration to MongoDB**
 
-### **Project Overview**
-This project demonstrates the use of Python for migrating healthcare data from a CSV file to a MongoDB database. The project incorporates functionality for performing CRUD (Create, Read, Update, Delete) operations on the MongoDB database and uses Docker to containerize both the Python script and the MongoDB instance for portability and scalability.
-
----
-
-### **Features**
-1. **Data Migration**:
-   - Reads healthcare data from a CSV file.
-   - Cleans the dataset by removing duplicates and ensuring logical consistency.
-   - Converts date fields to `datetime` format.
-   - Inserts the cleaned data into MongoDB.
-
-## **Data Integrity Checks**
-Before and after migration, the script performs the following data integrity checks:
-**Pre-migration checks**:
-   - Missing values in essential fields.
-   - Duplicates in the dataset.
-   - Invalid dates (Discharge Date must be after Admission Date).
-   - Negative values in key fields like Age and Billing Amount.
-**Post-migration checks**:
-   - Ensures the number of records in MongoDB matches the original dataset.
-   - Verifies that required fields (e.g., Age, Medical Condition, Name) are present.
-   - Checks that dates and numeric fields are logically consistent.
-
-
-
-2. **CRUD Operations**:
-   - **Create**: Add new records to the database.
-   - **Read**: Query records based on specific criteria.
-   - **Update**: Modify existing records.
-   - **Delete**: Remove records from the database.
-
-3. **Containerization**:
-   - A `Dockerfile` to containerize the Python script for migration and CRUD operations.
-   - A `docker-compose.yml` to manage the MongoDB and Python containers.
+A simple Docker-based solution to migrate CSV healthcare data to MongoDB with validation and CRUD operations.
 
 ---
 
-### **Authentication System and User Roles**
+##  **Quick Start**
 
-#### **MongoDB Authentication**
-MongoDB uses role-based access control (RBAC) to manage user permissions. For this project, authentication is enabled, and the **admin user** has full access to the MongoDB instance.
+### **Prerequisites**
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
-- **Admin User**:
-  - **Username**: `admin`
-  - **Password**: `motasem`
-  - **Role**: `root` (Full administrative access to MongoDB)
-  - This user is responsible for managing all aspects of MongoDB, including user creation and database management.
-  
-- **MongoDB Roles**:
-  - **`root`**: Full administrative control over the MongoDB instance, including creating users, managing databases, and running all administrative commands.
-  - **Authentication** is enabled, so you must provide the **admin credentials** (`admin:motasem`) when connecting to MongoDB.
-
----
-
-### **Database Schema**
-
-#### **Database: `healthcare`**
-The `healthcare` database contains the following **patients** collection.
-
-- **Collection Name**: `patients`
-
-##### **Fields in the `patients` Collection**:
-- **`Name`** (string): Patient's full name.
-- **`Age`** (integer): Patient's age.
-- **`Gender`** (string): Patient's gender.
-- **`Blood Type`** (string): Patient's blood type.
-- **`Medical Condition`** (string): Medical condition diagnosis.
-- **`Date of Admission`** (datetime): Date the patient was admitted.
-- **`Discharge Date`** (datetime): Date the patient was discharged.
-- **`Doctor`** (string): Name of the attending doctor.
-- **`Room Number`** (integer): Room number assigned to the patient.
-- **`Billing Amount`** (float): Billing amount for the treatment.
-- **`Admission Type`** (string): Type of admission (e.g., Routine, Emergency).
-- **`Insurance Provider`** (string): The insurance company providing coverage.
-- **`Medication`** (string): Medication prescribed to the patient.
-- **`Test Results`** (string): Results of medical tests conducted.
-
-The schema is simple, focusing on patient details and hospital admission information.
-
----
-
-### **Installation and Setup**
-
-#### **Step 1: Clone the Repository**
+### **Run in 3 Steps**
 ```bash
+# 1. Clone and enter the project
 git clone https://github.com/Motasem-mk/project5-MongoDB.git
 cd project5-MongoDB
-```
 
-#### **Step 2: Install Python Dependencies**
-Create and activate a virtual environment (optional but recommended):
-```bash
-python -m venv env
-source env/bin/activate  # On Windows: .\env\Scripts\activate
-```
-Install the dependencies:
-```bash
-pip install -r requirements.txt
-```
+# 2. Set up credentials (edit with your values)
+cp .env.example .env
 
-#### **Step 3: Run the Python Script**
-Execute the migration script to load data into MongoDB:
-```bash
-python mongodbproject.py
+# 3. Start the pipeline
+docker-compose up
 ```
-
-#### **Step 4: Dockerize the Application**
-1. Build the Docker image for the Python script:
-   ```bash
-   docker build -t mongodb-migration .
-   ```
-
-2. Use Docker Compose to run both MongoDB and the Python container:
-   ```bash
-   docker-compose up
-   ```
 
 ---
 
-### **File Structure**
-- `mongodbproject.py`: The Python script for data migration and CRUD operations.
-- `requirements.txt`: Python dependencies.
-- `Dockerfile`: Instructions to containerize the Python script.
-- `docker-compose.yml`: Configuration for running MongoDB and the Python container together.
-- `README.md`: Documentation of the project.
+## **Project Structure**
+```
+├── Dockerfile               # Python environment setup
+├── docker-compose.yml       # MongoDB + migration service
+├── healthcare_dataset.csv   # Sample dataset
+├── mongodbproject.py        # Migration/CRUD logic
+├── requirements.txt         # Python dependencies
+├── .env.example             # Credentials template
+├── .gitignore               # Files to ignore in the repository
+└── README.md                # This documentation
+```
 
 ---
 
-### **Docker Instructions**
+## **Environment Variables**
 
-#### **Build and Run Docker Images**
-1. Build the Docker image for the Python script:
-   ```bash
-   docker build -t mongodb-migration .
-   ```
+- Configure MongoDB credentials in the `.env` file:
+```
+MONGO_INITDB_ROOT_USERNAME=your_username
+MONGO_INITDB_ROOT_PASSWORD=your_password
+```
 
-2. Pull the official MongoDB image:
-   ```bash
-   docker pull mongo:latest
-   ```
-
-3. Use Docker Compose to start the services:
-   ```bash
-   docker-compose up
-   ```
-
-#### **Docker Compose Configuration**
-- **MongoDB Service**:
-  - Image: `mongo:latest`
-  - Volume: Persists MongoDB data.
-
-- **Migration Service**:
-  - Image: Built from the provided `Dockerfile`.
-  - Depends on the MongoDB service.
+- Example `.env.example` file:
+```
+MONGO_INITDB_ROOT_USERNAME=your_username
+MONGO_INITDB_ROOT_PASSWORD=your_password
+```
 
 ---
 
-### **CRUD Operations**
+## **Steps to Verify Data**
 
-#### **Create a Record**
-Adds a new patient record to the database.
-Example:
+1. Connect to MongoDB using **MongoDB Compass**:
+   ```
+   mongodb://your_username:your_password@localhost:27017/
+   ```
+
+2. Check the `healthcare` database and the `patients` collection to confirm the data migration.
+
+---
+
+## **Docker Configuration**
+
+### **docker-compose.yml**
+```yaml
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mongodb-migration
+    depends_on:
+      - mongodb
+    volumes:
+      - ./healthcare_dataset.csv:/app/healthcare_dataset.csv
+
+volumes:
+  mongodb_data:
+```
+
+---
+
+### **Dockerfile**
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 27017
+
+CMD ["python", "mongodbproject.py"]
+```
+
+---
+
+## **Data Migration Process**
+
+1. **Loading the Data**:
+   - The script reads the CSV file (`healthcare_dataset.csv`) using `pandas`.
+
+2. **Data Cleaning**:
+   - Removes duplicates and invalid records.
+   - Converts date columns to datetime format.
+   - Normalizes text fields (e.g., names).
+
+3. **Data Insertion**:
+   - The cleaned data is inserted into the `patients` collection in the `healthcare` database.
+   - Post-migration checks validate the data integrity.
+
+---
+
+## **Volumes**
+
+1. **mongodb_data**:
+   - Persistently stores MongoDB data between container restarts.
+
+2. **CSV Volume**:
+   - Mounts the `healthcare_dataset.csv` file inside the container at `/app/healthcare_dataset.csv`.
+
+---
+
+## **CRUD Operations**
+
+### **Create**
 ```python
 new_record = {
     "Name": "Alice Brown",
     "Age": 25,
-    "Gender": "Female",
-    "Blood Type": "A+",
     "Medical Condition": "Asthma",
     "Date of Admission": "2024-03-01",
-    "Doctor": "Sarah Lee",
-    "Hospital": "MediCare Center",
-    "Insurance Provider": "United Health",
-    "Billing Amount": 12345.67,
-    "Room Number": 201,
-    "Admission Type": "Routine",
-    "Discharge Date": "2024-03-05",
-    "Medication": "Inhaler",
-    "Test Results": "Improved"
+    "Discharge Date": "2024-03-05"
 }
-create_patient_record(new_record)
+collection.insert_one(new_record)
 ```
 
-#### **Read Records**
-Query records from the database.
-Example:
+### **Read**
 ```python
-query = {"Age": {"$gte": 87}}
-read_patient_records(collection, query)
+results = collection.find({"Age": {"$gte": 88}})
 ```
 
-#### **Update Records**
-Modify existing records in the database.
-Example:
+### **Update**
 ```python
-query = {"Name": "Alice Brown"}
-update_fields = {"Room Number": 203, "Billing Amount": 12000}
-update_patient_record(collection, query, update_fields)
+collection.update_many({"Name": "Alice Brown"}, {"$set": {"Room Number": 203}})
 ```
 
-#### **Delete Records**
-Remove records from the database.
-Example:
+### **Delete**
 ```python
-query = {"Name": "Alice Brown"}
-delete_patient_records(collection, query)
+collection.delete_many({"Name": "Alice Brown"})
 ```
 
 ---
 
-### **Purpose of Docker Compose**
-Docker Compose allows you to define and run multi-container Docker applications. In this project:
-- MongoDB runs in one container.
-- The Python script runs in another container.
-- The two containers communicate through a Docker network.
+## **Dependencies**
+Listed in `requirements.txt`:
+```
+pandas
+pymongo
+```
+Install them using:
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-### **Future Enhancements**
-- Deploy the application on AWS using Amazon ECS and DocumentDB.
-- Automate backup and monitoring for MongoDB.
-- Add more advanced data validation and transformation steps.
+## **Project Limitations**
+- This project focuses on data migration and basic CRUD operations.
+- No additional indexes were created apart from the default `_id` index.
+- Future improvements could include performance optimizations, such as indexing frequently queried fields. 
 
 ---
 
-## **Author**
-Motasem Abualqumboz
+## **Troubleshooting**
 
-For more information, refer to the [GitHub Repository](https://github.com/Motasem-mk/project5-MongoDB).
+### **1. MongoDB Connection Issues**
+   Ensure that:
+   - Docker containers are running.
+   - MongoDB is exposed on port `27017`.
+
+### **2. Data Issues**
+   If data migration fails, ensure the CSV file:
+   - Has no missing or invalid fields.
+   - Contains valid date formats.
+
+---
+
+## **Contributors**
+- Motasem Abualqumboz – Data Engineer Intern at DataSoluTech
